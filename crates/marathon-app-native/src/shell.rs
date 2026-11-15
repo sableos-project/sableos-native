@@ -504,8 +504,7 @@ macro_rules! asks {
         fn $name(&self, $($arg: $ty),*) -> $ret {
             $service
                 .ask_now::<_, <$ret as crate::shell::Reply>::Wire>($method, &($(crate::shell::Arg::wire($arg),)*))
-                .map(<$ret as crate::shell::Reply>::from_wire)
-                .unwrap_or_default()
+                .map_or_default(<$ret as crate::shell::Reply>::from_wire)
         }
     )*};
 }
