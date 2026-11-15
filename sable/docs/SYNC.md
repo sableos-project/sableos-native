@@ -9,7 +9,7 @@ work regularly, so that Q25 hardware fixes arrive here without being redone.
 |---|---|
 | `origin` | `github.com/sableos-project/sableos-native` |
 | `upstream` (remote) | `github.com/patrickjquinn/Marathon-Shell` |
-| `upstream` (branch) | Mirror of Marathon's `release/q25-v1`; never committed to by hand |
+| `upstream` (branch) | Mirror of Marathon's `main` (its latest stable; Marathon's OTA releases are built from it); never committed to by hand |
 | `main` | SableOS Native |
 
 One-time setup in a fresh clone:
@@ -21,11 +21,16 @@ git config remote.upstream.tagOpt --no-tags
 
 ## Weekly sync (and at once for every Marathon Q25 release)
 
+Marathon's `main` is its latest stable branch and the base of its OTA
+releases (Patrick Quinn, 2026-11-15). Until then SableOS Native followed
+`release/q25-v1`, which `main` contains.
+
+
 ```sh
-git fetch upstream release/q25-v1
-git push origin upstream/release/q25-v1:upstream   # update the mirror branch
+git fetch upstream main
+git push origin upstream/main:upstream   # update the mirror branch (admin only)
 git switch -c sync/$(date +%Y%m%d) origin/main
-git merge --no-ff upstream/release/q25-v1
+git merge --no-ff upstream/main
 cd sable/crates && cargo test && cd -              # plus Marathon's CI on the PR
 ```
 
