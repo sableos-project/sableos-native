@@ -13,7 +13,9 @@ pub enum SettingsError {
     Parse(String),
     /// A value is outside its allowed range.
     Invalid {
+        /// The settings field that failed.
         field: &'static str,
+        /// Why the value was refused.
         reason: &'static str,
     },
 }
@@ -112,7 +114,9 @@ pub enum KeyAction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KeyBinding {
+    /// Meaning of a short press.
     pub press: KeyAction,
+    /// Meaning of a press held longer than `hold_ms`.
     pub hold: KeyAction,
 }
 
@@ -123,9 +127,13 @@ pub struct KeyBinding {
 pub struct KeysConfig {
     /// How long a press lasts before it counts as a hold, in milliseconds.
     pub hold_ms: u32,
+    /// The green Call key.
     pub call: KeyBinding,
+    /// The Menu (BlackBerry) key.
     pub menu: KeyBinding,
+    /// The Back key.
     pub back: KeyBinding,
+    /// The red End key.
     pub end: KeyBinding,
 }
 
