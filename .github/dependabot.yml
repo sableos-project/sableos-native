@@ -1,0 +1,17 @@
+# Dependency updates for SableOS Native's own code only.
+# Marathon's dependencies (crates/, its workflows) arrive through upstream
+# merges, so Dependabot does not open PRs against them here. GitHub Actions
+# used by SableOS workflows are pinned by commit and updated by hand.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /sable/crates
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+      include: scope
+    labels: [dependencies]
+    groups:
+      rust-minor-and-patch:
+        update-types: [minor, patch]
