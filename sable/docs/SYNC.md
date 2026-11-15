@@ -49,3 +49,32 @@ Marathon's tags are not fetched; SableOS Native has its own tag scheme
 
 Bug fixes, Q25 hardware fixes and the small hooks themselves, as pull requests
 to Marathon-Shell. The BB10 look and behaviour stay here.
+
+## Fixing Marathon's own code: one commit, two destinations
+
+A fix to a Marathon file (not BB10 work) is written once, on a branch based on
+Marathon's `main`, and the same commit goes both upstream and into SableOS
+Native. Git then sees identical changes when Patrick merges it, so the next
+sync does not conflict and nothing is maintained twice.
+
+One-time setup in a `sableos-native` clone:
+
+```sh
+git remote add fork https://github.com/aimindseye/Marathon-Shell.git
+```
+
+For each fix:
+
+```sh
+git fetch upstream main
+git switch -c fix/<topic> upstream/main     # Patrick's code, not ours
+# edit, test (sable/scripts/build-marathon.sh), commit with a Conventional subject
+git push fork fix/<topic>                   # open the PR to patrickjquinn/Marathon-Shell:main
+git push origin fix/<topic>                 # open a PR into sableos-native main if we need it now
+```
+
+Record the change in `HOOKS.md` with the upstream PR or issue. When Patrick
+merges it, the next sync brings his copy in; then delete the row.
+
+Never base a fix for upstream on our `main`: it would carry `sable/` files and
+our hooks into the PR.
