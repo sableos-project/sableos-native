@@ -1,8 +1,10 @@
 name: SableOS Native
 
+# Runs on every pull request (it takes about a minute) so that it can be a
+# required check in the main branch ruleset: a path filter would leave PRs that
+# don't touch sable/ waiting for a check that never runs.
 on:
   pull_request:
-    paths: ["sable/**", ".github/workflows/sable-ci.yml"]
   push:
     branches: ["main"]
     paths: ["sable/**", ".github/workflows/sable-ci.yml"]
@@ -17,7 +19,7 @@ concurrency:
 # SableOS Native's own Rust workspace (sable/crates). Marathon's ci.yml keeps
 # building and testing the rest of the tree.
 jobs:
-  rust:
+  sable-rust:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
