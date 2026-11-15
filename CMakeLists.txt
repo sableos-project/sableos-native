@@ -202,6 +202,7 @@ if(NOT DEFINED MARATHON_VERSION)
     set(MARATHON_VERSION "${PROJECT_VERSION}")
 endif()
 add_subdirectory(crates)
+add_subdirectory(sable) # SableOS Native (sable/docs/HOOKS.md)
 
 add_subdirectory(marathon-silica)
 add_subdirectory(marathon-icon-theme)
