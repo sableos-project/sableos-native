@@ -1,0 +1,35 @@
+name: SableOS Native
+
+on:
+  pull_request:
+    paths: ["sable/**", ".github/workflows/sable-ci.yml"]
+  push:
+    branches: ["main"]
+    paths: ["sable/**", ".github/workflows/sable-ci.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sable-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# SableOS Native's own Rust workspace (sable/crates). Marathon's ci.yml keeps
+# building and testing the rest of the tree.
+jobs:
+  rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: sable/crates
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Toolchain
+        run: rustup toolchain install stable --profile minimal --component clippy,rustfmt && rustup default stable
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: Test
+        run: cargo test --locked

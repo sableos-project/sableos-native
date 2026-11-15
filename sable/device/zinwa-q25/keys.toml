@@ -1,0 +1,20 @@
+# Phone keys on the Zinwa Q25 (BlackBerry Classic layout).
+# Schema: sable/crates/sable-settings (KeysConfig). Key codes come from Marathon's
+# Q25 keyd layout; this file only gives each key its BB10 meaning.
+hold_ms = 500
+
+[call]   # green
+press = "answer-or-phone"
+hold = "voice-dial"
+
+[menu]   # BlackBerry key
+press = "action-menu"
+hold = "app-menu"
+
+[back]
+press = "back"
+hold = "none"
+
+[end]    # red
+press = "end-or-frames"
+hold = "power-menu"

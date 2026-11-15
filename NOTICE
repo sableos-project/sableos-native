@@ -1,0 +1,28 @@
+SableOS Native
+Copyright 2026 The SableOS Project contributors
+
+This product is a fork of Marathon OS (Marathon Shell),
+https://github.com/patrickjquinn/Marathon-Shell
+Copyright 2025 Patrick Quinn and the Marathon contributors,
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Files under sable/ are SableOS Native additions, also licensed under the
+Apache License, Version 2.0. Marathon files changed by SableOS Native are
+listed in sable/docs/HOOKS.md.
+
+Components that keep their own licences:
+- Deckard, the Android runtime (GPL-3.0-or-later): its source is published
+  for every release that ships it.
+- The device kernels (GPL-2.0-only): their source is published for every
+  release that ships them.
+- Keel / Sailfish Silica for Qt 6 (MIT, BSD-3-Clause, LGPL-2.1-only): the
+  LGPL parts stay replaceable by the user.
+- Third-party components listed by Marathon in its own notices.
+
+Proprietary device firmware (for example the Zinwa Q25 Wi-Fi and Bluetooth
+firmware) is never stored in this repository; builds copy it from the
+user's own phone.
+
+"Marathon" is a name of the Marathon OS project and is not used as the name
+of this product. BlackBerry and BB10 are trademarks of their respective
+owners; SableOS is not affiliated with or endorsed by them.

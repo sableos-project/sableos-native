@@ -1,0 +1,5 @@
+# Flow gesture thresholds for the Zinwa Q25 (720x720, scale 1.5).
+# Schema: sable/crates/sable-settings (FlowConfig). Sizes in dp, fractions of the screen.
+edge_zone_dp = 16.0          # 24 px at scale 1.5
+minimise_fraction = 0.15     # swipe up past 15% of the height, release = minimise to Frames
+hub_commit_fraction = 0.5    # while peeking, move right past half the width, release = open Hub
