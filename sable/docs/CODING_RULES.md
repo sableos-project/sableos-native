@@ -55,6 +55,10 @@ Enforced by `sable/crates/Cargo.toml` lints and `.github/workflows/sable-ci.yml`
 
 ## 5. What CI checks
 
+Run the same checks before pushing with `sable/scripts/check.sh` and
+`sable/scripts/security.sh` (set up once with `sable/scripts/setup-ubuntu.sh`).
+
+
 | Check | Workflow | Blocks merge? |
 |---|---|---|
 | Format, clippy `-D warnings`, tests for `sable/crates` | `sable-ci.yml` (`sable-rust`) | Yes |
