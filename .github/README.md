@@ -40,14 +40,15 @@ close to upstream as possible; SableOS Native work lives under [`sable/`](../sab
 Branches: `main` is SableOS Native. `upstream` mirrors Marathon's
 `release/q25-v1`. See [`sable/docs/SYNC.md`](../sable/docs/SYNC.md).
 
-## Build
+## Build and check locally (Ubuntu)
 
-The SableOS Rust workspace builds and tests on any Linux host:
+Scripts in `sable/scripts/` run the same checks as CI, on Ubuntu 24.04 or newer:
 
 ```sh
-cd sable/crates
-cargo test
-cargo clippy --all-targets -- -D warnings
+sable/scripts/setup-ubuntu.sh        # once: rustfmt, clippy, cargo-deny, zizmor, gitleaks, podman
+sable/scripts/check.sh               # format, clippy, tests, cargo-deny, Marathon's test lint
+sable/scripts/security.sh            # secrets, dependency and workflow checks (--full: whole history)
+sable/scripts/build-marathon.sh      # Marathon's full build and tests in alpine:edge (--arm64 like CI)
 ```
 
 Marathon's own build, simulator and image instructions are in

@@ -1,0 +1,123 @@
+name: SableOS Security
+
+# Security checks for SableOS Native. Blocking jobs cover what SableOS owns
+# (sable/, our workflows, new commits). Report-only jobs cover Marathon's own
+# code, so upstream findings are visible here without blocking our merges;
+# fixes for them go to Marathon (sable/docs/SYNC.md).
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+  schedule:
+    - cron: "23 6 * * 1" # Mondays: full-history and dependency rescans
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sable-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Secrets in new commits block; a full-history scan runs weekly and reports.
+  sable-secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Gitleaks 8.30.1 (checksum verified)
+        run: |
+          set -euo pipefail
+          v=8.30.1
+          curl --proto '=https' --tlsv1.2 -sSfL -o gl.tgz "https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_linux_x64.tar.gz"
+          curl --proto '=https' --tlsv1.2 -sSfL -o sums.txt "https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_checksums.txt"
+          grep " gitleaks_${v}_linux_x64.tar.gz\$" sums.txt | sed "s/gitleaks_${v}_linux_x64.tar.gz/gl.tgz/" | sha256sum -c -
+          tar -xzf gl.tgz gitleaks && sudo install gitleaks /usr/local/bin/
+      - name: Scan the commits this pull request adds
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: gitleaks git --redact --no-banner --exit-code 1 --log-opts="$BASE..$HEAD" .
+      - name: Scan full history (report only)
+        if: github.event_name != 'pull_request'
+        run: gitleaks git --redact --no-banner --exit-code 0 . | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # Known vulnerabilities, licences and sources of Rust dependencies.
+  sable-rust-deps:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Install cargo-deny 0.20.2
+        run: cargo install --locked cargo-deny --version 0.20.2
+      - name: SableOS crates (blocking)
+        working-directory: sable/crates
+        run: cargo deny check
+      - name: Marathon crates, advisories only (report)
+        continue-on-error: true
+        working-directory: crates
+        run: |
+          set -o pipefail
+          {
+            echo "### Marathon crates: RustSec advisories (report only)"
+            echo '```'
+            cargo deny --config ../sable/crates/deny.toml check advisories 2>&1 \
+              | grep -E "^(error|warning)\[|ID:|Solution" || true
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # Security audit of GitHub Actions workflows: injection, pinning, permissions.
+  sable-workflows:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Install zizmor 1.32.0
+        run: pipx install zizmor==1.32.0
+      - name: SableOS workflows (blocking)
+        run: zizmor --offline .github/workflows/sable-ci.yml .github/workflows/sable-security.yml
+      - name: Marathon workflows (report)
+        continue-on-error: true
+        run: |
+          {
+            echo "### Marathon workflows: zizmor (report only)"
+            echo '```'
+            zizmor --offline .github/workflows/ci.yml .github/workflows/format.yml .github/workflows/release.yml 2>&1 | tail -n 40
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # Static analysis with CodeQL: our Rust code and every workflow.
+  sable-codeql:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, rust]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          config: |
+            paths:
+              - sable
+              - .github/workflows
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
