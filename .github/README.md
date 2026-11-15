@@ -38,7 +38,7 @@ close to upstream as possible; SableOS Native work lives under [`sable/`](../sab
 | everything else | Marathon OS, merged from `upstream` |
 
 Branches: `main` is SableOS Native. `upstream` mirrors Marathon's
-`release/q25-v1`. See [`sable/docs/SYNC.md`](../sable/docs/SYNC.md).
+`main`, which Marathon's OTA releases are built from. See [`sable/docs/SYNC.md`](../sable/docs/SYNC.md).
 
 ## Build and check locally (Ubuntu)
 
