@@ -8,4 +8,4 @@ syncs in a row, propose it upstream (`SYNC.md`).
 
 | File | Change | Why | Upstreamable? | Added |
 |---|---|---|---|---|
-| (none yet) | | | | |
+| `CMakeLists.txt` | `add_subdirectory(sable)` after `add_subdirectory(crates)` | Registers SableOS tests (`sable/CMakeLists.txt`) with CTest, so Marathon's CI runs them and `Lint_TestReachability` passes | No (SableOS only) | 2026-11-15 |
